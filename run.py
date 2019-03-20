@@ -15,6 +15,7 @@ db = SQLAlchemy(app)
 import views, models, resources
 path_api ='/api/v1'
 
+
 #authentification
 api.add_resource(resources.UserRegistration, path_api+'/registration')
 api.add_resource(resources.UserLogin, path_api+'/login')
@@ -23,12 +24,11 @@ api.add_resource(resources.UserLogoutAccess, path_api+'/logout/access')
 
 
 #User
-api.add_resource(resources.GetUser,path_api+'/User/<int:id_user>/<username>', endpoint='id_user')
+api.add_resource(resources.GetUser,path_api+'/User/<int:id_user>/<username>')
 
 
 
 #Task
-
 
 api.add_resource(resources.UserLogoutRefresh, '/logout/refresh')
 api.add_resource(resources.TokenRefresh, '/token/refresh')
