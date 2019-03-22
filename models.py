@@ -23,16 +23,23 @@ class UserModel(db.Model):
     	return cls.query.filter_by(email = email).first()
 
     @classmethod
-    def find_by_user(cls, id_user, username):
+    def find_by_user(cls, id_user):
     	try:
-    		ambil=cls.query.filter_by(id_user = id_user, username = username).first()
+    		ambil=cls.query.filter_by(id_user = id_user).first()
     		return {'success':'true',
     				'id_user':ambil.id_user,
     				'username':ambil.username}
     	except:
     		return {'success':'false'}
 
-
+    @classmethod
+    def get_all_task(cls):
+        try:
+            for instance in session.query(User).order_by(User.id_user):  
+                return {instance.username, instance.email}    
+        except:
+            return {'success':'false'}
+    
     @classmethod
     def return_all(cls):
         def to_json(x):

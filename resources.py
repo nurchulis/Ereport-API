@@ -1,9 +1,11 @@
 from flask_restful import Resource, reqparse
 from models import UserModel
 from flask import json
+from run import mysql
 
 register = reqparse.RequestParser()
 auth = reqparse.RequestParser()
+join = reqparse.RequestParser()
 #parser.add_argument('username', help = 'This field cannot be blank',location='form', required = True)
 register.add_argument('username', help = 'This field cannot be blank', required = True)
 register.add_argument('password', help = 'This field cannot be blank', required = True)
@@ -11,6 +13,11 @@ register.add_argument('email', help= 'This field cannot be blank', required = Tr
 
 auth.add_argument('username', help = 'This field cannot be blank or use json body Parameter', location='json', required = True)
 auth.add_argument('password', help = 'This field cannot be blank or use json body Parameter', location='json', required = True)
+
+#Parser For Join Task
+join.add_argument('id_task', help='this field cannot be blank', location='json', required= True)
+join.add_argument('id_user', help='this field cannot be blank', location='json', required= True)
+join.add_argument('roles', help='this field cannot be blank', location='json', required= True)
 
 class UserRegistration(Resource):
     def post(self):
@@ -61,13 +68,28 @@ class UserLogin(Resource):
 
 
 class GetUser(Resource):
-    def get(self, id_user=None, username=None):
+    def get(self, id_user=None):
         if not id_user:
             return 404
         # Do stuff
-        return UserModel.find_by_user(id_user, username)
+        return UserModel.find_by_user(id_user)
 
-
+class JoinTask(Resource):
+    def get(self):
+        data = join.parse_args()
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute(
+        """INSERT INTO Join_task (
+                id_task,
+                id_user,
+                roles
+            ) 
+            VALUES (%s,%s,%s)""",(data['id_task'],data['id_user'],data['roles']))
+        conn.commit()
+        conn.close()
+        return {'success':'true'}
+        
 
 class UserLogoutAccess(Resource):
     def post(self):
