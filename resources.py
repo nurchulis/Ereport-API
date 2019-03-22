@@ -9,6 +9,7 @@ register = reqparse.RequestParser()
 auth = reqparse.RequestParser()
 join = reqparse.RequestParser()
 task = reqparse.RequestParser()
+edittask = reqparse.RequestParser()
 #parser.add_argument('username', help = 'This field cannot be blank',location='form', required = True)
 register.add_argument('username', help = 'This field cannot be blank', required = True)
 register.add_argument('password', help = 'This field cannot be blank', required = True)
@@ -26,6 +27,10 @@ join.add_argument('roles', help='this field cannot be blank', location='json', r
 task.add_argument('id_user', help='this field cannot be blank', location='json', required= True)
 task.add_argument('description', help='this field cannot be blank', location='json', required= True)
 task.add_argument('name_location', help='this field cannot be blank', location='json', required= True)
+
+#parser For Edit Task
+edittask.add_argument('description', help='this field cannot be blank', location='json', required= True)
+edittask.add_argument('name_location', help='this field cannot be blank', location='json', required= True)
 
 
 
@@ -125,17 +130,24 @@ class JoinTask(Resource):
         data = join.parse_args()
         conn = mysql.connect()
         cursor = conn.cursor()
-        cursor.execute(
-        """INSERT INTO Join_task (
+
+        result=cursor.execute("SELECT * from Join_task where id_task = %s AND id_user = %s", (data['id_task'], data['id_user']))
+        
+        if (result):
+                return {'success':'false',
+                        'message': 'Task already join'}
+        else:  
+
+                cursor.execute(
+                """INSERT INTO Join_task (
                 id_task,
                 id_user,
                 roles
-            ) 
-            VALUES (%s,%s,%s)""",(data['id_task'],data['id_user'],data['roles']))
-        conn.commit()
-        conn.close()
-        return {'success':'true'}
-
+                ) 
+                VALUES (%s,%s,%s)""",(data['id_task'],data['id_user'],data['roles']))
+                conn.commit()
+                conn.close()
+                return {'success':'true'}        
 
 class ShowTask(Resource):
     def get(self, id_user=None):
@@ -161,7 +173,6 @@ class ShowTask(Resource):
 class CreateTask(Resource):
     def post(self):
         data = task.parse_args()
-
         conn = mysql.connect()
         cursor = conn.cursor()
         id_task=randomString()
@@ -200,5 +211,19 @@ def JoinTask_Create(id_task, id_user, level, descriptions, name_location):
                 'name_location':name_location
                 }
                 }
+
+class UpdateTask(Resource):
+        def post(self, id_task=None):
+            data = edittask.parse_args()            
+            conn = mysql.connect()
+            cursor = conn.cursor()
+            result = cursor.execute("UPDATE Task SET description = %s, name_location = %s WHERE id_task = %s",
+                            (data['description'],data['name_location'],int(id_task)))
+            conn.commit()
+            conn.close()
+            if(result):
+                return {'success':'true'}
+            else:
+                return {'success':'false'}
 
 
