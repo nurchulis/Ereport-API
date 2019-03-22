@@ -2,10 +2,13 @@ from flask_restful import Resource, reqparse
 from models import UserModel
 from flask import json
 from run import mysql
+import random
+import string
 
 register = reqparse.RequestParser()
 auth = reqparse.RequestParser()
 join = reqparse.RequestParser()
+task = reqparse.RequestParser()
 #parser.add_argument('username', help = 'This field cannot be blank',location='form', required = True)
 register.add_argument('username', help = 'This field cannot be blank', required = True)
 register.add_argument('password', help = 'This field cannot be blank', required = True)
@@ -19,6 +22,16 @@ join.add_argument('id_task', help='this field cannot be blank', location='json',
 join.add_argument('id_user', help='this field cannot be blank', location='json', required= True)
 join.add_argument('roles', help='this field cannot be blank', location='json', required= True)
 
+#Parser For Create Task
+task.add_argument('id_user', help='this field cannot be blank', location='json', required= True)
+task.add_argument('description', help='this field cannot be blank', location='json', required= True)
+task.add_argument('name_location', help='this field cannot be blank', location='json', required= True)
+
+
+
+def randomString():
+    for x in range(100):
+        return random.randint(1,1100000)
 class UserRegistration(Resource):
     def post(self):
         data = register.parse_args()
@@ -74,23 +87,6 @@ class GetUser(Resource):
         # Do stuff
         return UserModel.find_by_user(id_user)
 
-class JoinTask(Resource):
-    def get(self):
-        data = join.parse_args()
-        conn = mysql.connect()
-        cursor = conn.cursor()
-        cursor.execute(
-        """INSERT INTO Join_task (
-                id_task,
-                id_user,
-                roles
-            ) 
-            VALUES (%s,%s,%s)""",(data['id_task'],data['id_user'],data['roles']))
-        conn.commit()
-        conn.close()
-        return {'success':'true'}
-        
-
 class UserLogoutAccess(Resource):
     def post(self):
         return {'message': 'User logout'}
@@ -119,3 +115,90 @@ class SecretResource(Resource):
         return {
             'answer': 42
         }
+
+
+#==========This For Tables Task===================
+
+
+class JoinTask(Resource):
+    def post(self):
+        data = join.parse_args()
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute(
+        """INSERT INTO Join_task (
+                id_task,
+                id_user,
+                roles
+            ) 
+            VALUES (%s,%s,%s)""",(data['id_task'],data['id_user'],data['roles']))
+        conn.commit()
+        conn.close()
+        return {'success':'true'}
+
+
+class ShowTask(Resource):
+    def get(self, id_user=None):
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        result = cursor.execute("SELECT Task.id_task, Join_task.id_user, Task.description, Join_task.roles FROM Join_task JOIN User JOIN Task WHERE Join_task.id_task=Task.id_task AND Join_task.id_user=User.id_user AND Join_task.id_user= %s ",int(id_user))
+        data = cursor.fetchall()
+        results = []
+        if(result):
+            for item in data:
+                dataResponse = {
+                'id_task'     : item[0],
+                'id_user'     : item[1],
+                'descriptions'   : item[2],
+                'roles'  : item[3],
+            }
+                results.append(dataResponse)
+            return ({'success':'true',
+                    'data':results})
+        else:
+            return json.dumps({'data':'null'})
+
+class CreateTask(Resource):
+    def post(self):
+        data = task.parse_args()
+
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        id_task=randomString()
+        id_user=data['id_user']
+        result = cursor.execute(
+        """INSERT INTO Task (
+                id_task,    
+                description,
+                name_location
+            ) 
+            VALUES (%s,%s,%s)""",(id_task,data['description'],data['name_location']))
+        conn.commit()
+        conn.close()
+        level='boss'
+        if(result): 
+            return JoinTask_Create(id_task,id_user,level, data['description'], data['name_location'])
+        else:
+            return {"success":"false"}
+
+def JoinTask_Create(id_task, id_user, level, descriptions, name_location):
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.execute(
+        """INSERT INTO Join_task (
+                id_task,
+                id_user,
+                roles
+            ) 
+            VALUES (%s,%s,%s)""",(id_task,id_user,level))
+        conn.commit()
+        conn.close()
+        return {'success':'true',
+                'data':{
+                'id_task':id_task,
+                'description':descriptions,
+                'name_location':name_location
+                }
+                }
+
+

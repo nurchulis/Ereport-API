@@ -41,6 +41,10 @@ api.add_resource(resources.GetUser,path_api+'/User/<int:id_user>')
 
 #Task
 api.add_resource(resources.JoinTask, path_api+'/JoinTask')
+api.add_resource(resources.ShowTask, path_api+'/ShowTask/<int:id_user>')
+api.add_resource(resources.CreateTask, path_api+'/CreateTask')
+
+
 api.add_resource(resources.UserLogoutRefresh, '/logout/refresh')
 api.add_resource(resources.TokenRefresh, '/token/refresh')
 api.add_resource(resources.AllUsers, '/users')
