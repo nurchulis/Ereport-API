@@ -1,6 +1,6 @@
 # API-Reporting
 Api For reporting Task with Photos and Geolocation, With JWT
-![Alt text](https://raw.githubusercontent.com/nurchulis/API-Reporting/master/Rest%20API%20with%20python.png?raw=true "Title")
+![Alt text](https://raw.githubusercontent.com/nurchulis/API-Reporting/master/Rest%20API.png?raw=true "Title")
 
 **JOIN TO this Trello https://trello.com/invite/b/viAzxQnp/703941d28ea6b1a7abd5ad15e4ef80ac/api-ereport-upload-image-geolocation For See update development**
 
