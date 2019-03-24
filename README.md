@@ -1,10 +1,9 @@
 # API-Reporting
 Api For reporting Task with Photos and Geolocation, With JWT
-![Alt text](https://raw.githubusercontent.com/nurchulis/learning-API/master/Rest%20API%20with%20python.png?raw=true "Title")
+![Alt text](https://raw.githubusercontent.com/nurchulis/API-Reporting/master/Rest%20API%20with%20python.png?raw=true "Title")
 
-**JOIN TO this Trello https://trello.com/b/FutPKgCN/api-elearning For See update development**
+**JOIN TO this Trello https://trello.com/invite/b/viAzxQnp/703941d28ea6b1a7abd5ad15e4ef80ac/api-ereport-upload-image-geolocation For See update development**
 
-** Ready use here : http://api-learning.puspidep.org/ *
 
 **requirements**
 you must install Flask library in your computer
@@ -29,28 +28,30 @@ Spesification: Endpoint
 1. **Authentications** :
     - User Login
     - User Register
-    - Verifi Account
-    - User Logout(not yet)
-    - Forgot Password(not yet)
+    - User Logout*
+    - Verif Account email*
    
-2. **User**
-    - User Activation
-    - Get User
-    - Update User Profile
-    - Update photo Profile
+2. **User **:
+    - Get User *
+    - Update User Profile*
+    - Forgot Password*
+    - Join Task
 
-3. **Class**:
-    - Get All Class
-    - Get Class
-    - Get Post Class
-    - Post articel in Class
-    - Edit articel in Class
-    - Delete articel in Class 
-    - Join to Class
-    - Accept User
-    - Comment Post
-    - Delete Comment
-    - Edit Comment
+3. **Task**:
+    - Get All Task (Boss & Staff)*
+    - Join Task*
+    - Create Task (Boss)*
+    - Edit Task (Boss)*
+
+4. **Task Data**:
+    - Post Data in Task (Staff)*
+    - Post Upload multiple Image In Task (Staff)
+    - Edit Data Task*
+    - Delete Photos in Task (Staff by id)*
+  
+
+
+
     
 
 + fit
