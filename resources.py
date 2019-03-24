@@ -147,6 +147,7 @@ class AllUsers(Resource):
 
 
 
+
 #==========This For Tables Task===================
 
 
@@ -175,6 +176,7 @@ class JoinTask(Resource):
                 return {'success':'true'}        
 
 class ShowTask(Resource):
+    @jwt_required
     def get(self, id_user=None):
         conn = mysql.connect()
         cursor = conn.cursor()
@@ -318,3 +320,5 @@ def insert(uniqe_name,uniqe_name_data):
     VALUES (%s,%s)""",(uniqe_name_data,uniqe_name))
     conn.commit()
     conn.close()
+
+
