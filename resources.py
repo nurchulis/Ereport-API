@@ -1,15 +1,20 @@
+import os
 from flask_restful import Resource, reqparse
-from models import UserModel
-from flask import json
+from models import UserModel, RevokedTokenModel
+from flask import json, request
 from run import mysql
+from run import app
+from werkzeug import secure_filename
 import random
 import string
+from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 
 register = reqparse.RequestParser()
 auth = reqparse.RequestParser()
 join = reqparse.RequestParser()
 task = reqparse.RequestParser()
 edittask = reqparse.RequestParser()
+file = reqparse.RequestParser()
 #parser.add_argument('username', help = 'This field cannot be blank',location='form', required = True)
 register.add_argument('username', help = 'This field cannot be blank', required = True)
 register.add_argument('password', help = 'This field cannot be blank', required = True)
@@ -32,6 +37,7 @@ task.add_argument('name_location', help='this field cannot be blank', location='
 edittask.add_argument('description', help='this field cannot be blank', location='json', required= True)
 edittask.add_argument('name_location', help='this field cannot be blank', location='json', required= True)
 
+file.add_argument('file[]', location=['headers', 'values'])
 
 
 def randomString():
@@ -59,10 +65,14 @@ class UserRegistration(Resource):
 
         try:
             new_user.save_to_db()
+            access_token = create_access_token(identity = data['username'])
+            refresh_token = create_refresh_token(identity = data['username'])
             return {
                 'success':'true',
-                'message': 'User {} was created'.format( data['username'])
-            }
+                'message': 'User {} was created'.format(data['username']),
+                'access_token': access_token,
+                'refresh_token': refresh_token
+                }
         except:
             return {'success': 'false'}, 500
 
@@ -77,15 +87,19 @@ class UserLogin(Resource):
             'message': 'User {} doesn\'t exist'.format(data['username'])}
         
         if UserModel.verify_hash(data['password'], current_user.password):
+            access_token = create_access_token(identity = data['username'])
+            refresh_token = create_refresh_token(identity = data['username'])
             return {
-            'status':'true',
-            'message': 'Logged in as {}'.format(current_user.username)}
+                'message': 'Logged in as {}'.format(current_user.username),
+                'access_token': access_token,
+                'refresh_token': refresh_token
+                }
         else:
-            return {'success': 'false',
-                    'message': 'Parameter invalid use Json please'}, 500
+            return {'message': 'Wrong credentials'}
 
 
 class GetUser(Resource):
+    @jwt_required    
     def get(self, id_user=None):
         if not id_user:
             return 404
@@ -93,19 +107,35 @@ class GetUser(Resource):
         return UserModel.find_by_user(id_user)
 
 class UserLogoutAccess(Resource):
+    @jwt_required
     def post(self):
-        return {'message': 'User logout'}
+        jti = get_raw_jwt()['jti']
+        try:
+            revoked_token = RevokedTokenModel(jti = jti)
+            revoked_token.add()
+            return {'message': 'Access token has been revoked'}
+        except:
+            return {'message': 'Something went wrong'}, 500
 
 
 class UserLogoutRefresh(Resource):
+    @jwt_refresh_token_required
     def post(self):
-        return {'message': 'User logout'}
+        jti = get_raw_jwt()['jti']
+        try:
+            revoked_token = RevokedTokenModel(jti = jti)
+            revoked_token.add()
+            return {'message': 'Refresh token has been revoked'}
+        except:
+            return {'message': 'Something went wrong'}, 500
 
 
 class TokenRefresh(Resource):
+    @jwt_refresh_token_required
     def post(self):
-        return {'message': 'Token refresh'}
-
+        current_user = get_jwt_identity()
+        access_token = create_access_token(identity = current_user)
+        return {'access_token': access_token}
 
 class AllUsers(Resource):
     def get(self):
@@ -115,11 +145,6 @@ class AllUsers(Resource):
         return UserModel.delete_all()
 
 
-class SecretResource(Resource):
-    def get(self):
-        return {
-            'answer': 42
-        }
 
 
 #==========This For Tables Task===================
@@ -226,4 +251,70 @@ class UpdateTask(Resource):
             else:
                 return {'success':'false'}
 
+class Uploadgambar(Resource):
+    def post(self):
+        # Get the name of the uplo
+        uploaded_files = request.files.getlist("file[]")
+        filenames = []
+        uniqe_name_data=randomString()
+        for file in uploaded_files:
+            # Check if the file is one of the allowed types/extensions
+            if file and allowed_file(file.filename):
+                # Make the filename safe, remove unsupported chars
+                filename = secure_filename(file.filename)
+                # Move the file form the temporal folder to the upload
+                # folder we setup
+                uniqe_name=randomFile()+filename
 
+                
+                insert(uniqe_name,uniqe_name_data)
+
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], uniqe_name))
+                # Save the filename into a list, we'll use it later
+                filenames.append(uniqe_name)
+                # Redirect the user to the uploaded_file route, which
+                # will basicaly show on the browser the uploaded file
+        # Load an html page with a link to each uploaded file
+        return {'success':'true'}
+
+class UploadgambarWithData(Resource):
+    def post(self):
+        # Get the name of the uplo
+        uploaded_files = request.files.getlist("file[]")
+            
+
+        filenames = []
+        uniqe_name_data=randomString()
+        for file in uploaded_files:
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                
+                uniqe_name=randomFile()+filename                
+                
+                insert(uniqe_name,uniqe_name_data)
+
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], uniqe_name))
+                filenames.append(uniqe_name)
+        return {'success':'true'}
+
+        
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
+
+
+def randomFile(stringLength=25):
+    """Generate a random string of fixed length """
+    letters= string.ascii_lowercase
+    return ''.join(random.sample(letters,stringLength))
+
+
+def insert(uniqe_name,uniqe_name_data):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute(
+    """INSERT INTO Gambar (related_id,name_gambar) 
+    VALUES (%s,%s)""",(uniqe_name_data,uniqe_name))
+    conn.commit()
+    conn.close()
