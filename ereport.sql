@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Mar 22, 2019 at 03:28 PM
+-- Generation Time: Mar 24, 2019 at 11:11 PM
 -- Server version: 5.7.21-1
 -- PHP Version: 7.0.29-1+b1
 
@@ -35,6 +35,13 @@ CREATE TABLE `Data` (
   `related_gambar` varchar(25) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf32;
 
+--
+-- Dumping data for table `Data`
+--
+
+INSERT INTO `Data` (`id_data`, `id_task`, `geolocation`, `create_at`, `keterangan`, `related_gambar`) VALUES
+(1, 1, 'ojojo', '2019-03-22 20:58:31', 'ini', '88');
+
 -- --------------------------------------------------------
 
 --
@@ -58,7 +65,15 @@ INSERT INTO `Gambar` (`id_gambar`, `related_id`, `name_gambar`, `create_date`) V
 (33, 'hcngidvfwymuzjbsklpoeqrxt', 'cuxidflenqypzkwrjthmgvsbaloc.png', '2019-03-19 15:47:06'),
 (34, 'hcngidvfwymuzjbsklpoeqrxt', 'zjyvwtcbfkanhqrsimxgueodl0.jpeg', '2019-03-19 15:47:06'),
 (35, 'hcngidvfwymuzjbsklpoeqrxt', 'nsjluyebzrwaikmdovhxpqctfWhatsApp_Image_2018-12-19_at_21.45.42.jpeg', '2019-03-19 15:47:06'),
-(36, 'hcngidvfwymuzjbsklpoeqrxt', 'xekbcgfynhuzmtjvrpliosaqwuntitled.png', '2019-03-19 15:47:06');
+(36, 'hcngidvfwymuzjbsklpoeqrxt', 'xekbcgfynhuzmtjvrpliosaqwuntitled.png', '2019-03-19 15:47:06'),
+(37, '695334', 'ftnqxmwyabcvjlrgoskehdpzupp.jpeg', '2019-03-22 20:53:01'),
+(38, '94673', 'toieluxhgdprvkfwzansyqjmcpp.jpeg', '2019-03-22 20:53:32'),
+(39, '842244', 'msngkbvyzxtejhopiuacdwfrlpp.jpeg', '2019-03-22 20:54:17'),
+(40, '63284', 'yzlrmjcpneisduvakxbowhtgfpp.jpeg', '2019-03-22 20:59:48'),
+(41, '63284', 'tgknewdmhouxpzqryjsaivbfluntitled.png', '2019-03-22 20:59:48'),
+(42, '832589', 'rgzhtxpkvynolqabfcjwimdespp.jpeg', '2019-03-23 07:57:58'),
+(43, '162638', 'owsvymjukadfqnhitzlprxbgcpp.jpeg', '2019-03-23 08:07:51'),
+(44, '162638', 'khcaodebjiypvnwgztqurmslxuntitled.png', '2019-03-23 08:07:51');
 
 -- --------------------------------------------------------
 
@@ -88,6 +103,17 @@ INSERT INTO `Join_task` (`id_join`, `id_task`, `id_user`, `roles`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `revoked_tokens`
+--
+
+CREATE TABLE `revoked_tokens` (
+  `id` varchar(300) NOT NULL,
+  `jti` varchar(300) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf32;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `Task`
 --
 
@@ -102,7 +128,7 @@ CREATE TABLE `Task` (
 --
 
 INSERT INTO `Task` (`id_task`, `description`, `name_location`) VALUES
-(1, 'Foto Pengerjaan Renovasi Jalan Parangtritis KM 10.5', 'bantul Ysogyakarta'),
+(1, 'Foto Pengerjaan Renovasi Jalan Parangtritis KM 10.5', 'Bantul Yogyakarta'),
 (2, 'Laporan Foto Pembangunan Jembatan Bantul', 'Jetis Bantul Yogyakarta'),
 (3, 'Laporan Foto Pembangunan Irigasi', 'Pundong Bantul Yogyakarta'),
 (417865, 'Foto Pengerjaan Renovasi Jalan Parangtritis KM 10.5', 'bantul Yogyakarta'),
@@ -182,12 +208,12 @@ ALTER TABLE `User`
 -- AUTO_INCREMENT for table `Data`
 --
 ALTER TABLE `Data`
-  MODIFY `id_data` int(7) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_data` int(7) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT for table `Gambar`
 --
 ALTER TABLE `Gambar`
-  MODIFY `id_gambar` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id_gambar` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 --
 -- AUTO_INCREMENT for table `Join_task`
 --
