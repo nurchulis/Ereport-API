@@ -15,6 +15,7 @@ join = reqparse.RequestParser()
 task = reqparse.RequestParser()
 edittask = reqparse.RequestParser()
 file = reqparse.RequestParser()
+task_data = reqparse.RequestParser()
 #parser.add_argument('username', help = 'This field cannot be blank',location='form', required = True)
 register.add_argument('username', help = 'This field cannot be blank', required = True)
 register.add_argument('password', help = 'This field cannot be blank', required = True)
@@ -38,6 +39,10 @@ edittask.add_argument('description', help='this field cannot be blank', location
 edittask.add_argument('name_location', help='this field cannot be blank', location='json', required= True)
 
 file.add_argument('file[]', location=['headers', 'values'])
+
+#data
+task_data.add_argument('geolocation', help = 'This field cannot be blank',location='form', required = True)
+task_data.add_argument('keterangan', help = 'This field cannot be blank',location='form', required = True)
 
 
 def randomString():
@@ -279,12 +284,14 @@ class Uploadgambar(Resource):
         # Load an html page with a link to each uploaded file
         return {'success':'true'}
 
+
 class UploadgambarWithData(Resource):
-    def post(self):
+    def post(self, id_task=None):
         # Get the name of the uplo
         uploaded_files = request.files.getlist("file[]")
-            
-
+        data =task_data.parse_args()
+        geolocation = data['geolocation']
+        keterangan =data['keterangan']
         filenames = []
         uniqe_name_data=randomString()
         for file in uploaded_files:
@@ -294,6 +301,8 @@ class UploadgambarWithData(Resource):
                 uniqe_name=randomFile()+filename                
                 
                 insert(uniqe_name,uniqe_name_data)
+                insert_data(int(id_task),geolocation,keterangan,uniqe_name_data)
+
 
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], uniqe_name))
                 filenames.append(uniqe_name)
@@ -321,4 +330,12 @@ def insert(uniqe_name,uniqe_name_data):
     conn.commit()
     conn.close()
 
+def insert_data(id_task,geolocation,keterangan,uniqe_name_data):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute(
+    """INSERT INTO Data (id_task,geolocation,keterangan,related_gambar) 
+    VALUES (%s,%s,%s,%s)""",(id_task,geolocation,keterangan,uniqe_name_data))
+    conn.commit()
+    conn.close()
 

@@ -83,12 +83,12 @@ api.add_resource(resources.UpdateTask, path_api+'/UpdateTask/<int:id_task>')
 
 #Data
 api.add_resource(resources.Uploadgambar, path_api+'/SendImageMulti')
-api.add_resource(resources.UploadgambarWithData, path_api+'/SendDataTask')
+api.add_resource(resources.UploadgambarWithData, path_api+'/SendDataTask/<int:id_task>')
 
 
 api.add_resource(resources.UserLogoutRefresh, '/logout/refresh')
 api.add_resource(resources.TokenRefresh, path_api+'/token/refresh')
-api.add_resource(resources.AllUsers, '/users')
+api.add_resource(resources.AllUsers, path_api+'/users')
 
 if __name__ == '__main__':
     app.run()
