@@ -4,9 +4,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import json
 from flaskext.mysql import MySQL
 from flask_jwt_extended import JWTManager
+import views
 
 app = Flask(__name__)
-
+app=Flask(__name__,template_folder='static')
 api = Api(app)
 mysql = MySQL()
 
@@ -39,6 +40,11 @@ db = SQLAlchemy(app)
 
 import views, models, resources
 path_api ='/api/v1'
+
+
+@app.route('/')
+def main_world():
+    return render_template('index.html')
 
 # This is the path to the upload directory
 app.config['UPLOAD_FOLDER'] = 'uploads/'
@@ -91,4 +97,4 @@ api.add_resource(resources.TokenRefresh, path_api+'/token/refresh')
 api.add_resource(resources.AllUsers, path_api+'/users')
 
 if __name__ == '__main__':
-    app.run()
+     app.run(debug=True)
