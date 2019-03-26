@@ -17,7 +17,7 @@ you must install Flask library in your computer
 **How To Run**
 - Clone this Repo
 - Cd /api/
-- run in terminal **python api.py**
+- run in terminal **python run.py**
 
 
 and will start server on 127.0.0.1:5000
